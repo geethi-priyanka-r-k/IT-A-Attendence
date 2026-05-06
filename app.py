@@ -1,12 +1,5 @@
 import streamlit as st
 
-# Deployment Instructions for Streamlit Community Cloud:
-# 1. Save this code in a file named `app.py`.
-# 2. Push `app.py` to a GitHub repository.
-# 3. Log in to Streamlit Community Cloud (share.streamlit.io).
-# 4. Click "New app", select your repository, branch, and set the main file path to `app.py`.
-# 5. Click "Deploy". No external dependencies required other than Streamlit.
-
 st.set_page_config(page_title="IT-A Attendance", page_icon="📋", layout="centered")
 
 # Data Mapping
@@ -39,14 +32,12 @@ students = {
 }
 
 st.title("📋 IT-A Attendance")
-
 st.markdown("---")
 
 input_data = st.text_area(
     "Enter Register Numbers",
     placeholder="Example: 33,1,45",
-    height=150,
-    help="Enter register numbers separated by commas."
+    height=150
 )
 
 st.write("")
@@ -64,16 +55,13 @@ if st.button("Generate Attendance", use_container_width=True, type="primary"):
                 
             try:
                 num = int(num_str)
-                if 1 <= num <= 99:
-                    formatted_num = f"{num:02d}"
-                else:
-                    formatted_num = str(num)
-                    
+                formatted_num = f"{num:02d}" if num < 100 else str(num)
+                
                 if num in students:
-                    name = students[num]
-                    output_lines.append(f"{valid_idx}. {name} ({formatted_num})")
+                    output_lines.append(f"{valid_idx}. {students[num]} ({formatted_num})")
                 else:
                     output_lines.append(f"{valid_idx}. Unknown ({formatted_num})")
+                    
             except ValueError:
                 output_lines.append(f"{valid_idx}. Unknown ({num_str})")
                 
@@ -82,4 +70,15 @@ if st.button("Generate Attendance", use_container_width=True, type="primary"):
         if output_lines:
             st.markdown("### Output")
             final_output = "\n".join(output_lines)
-            st.text_area("Result", value=final_output, height=min(300, len(output_lines) * 30 + 50), label_visibility="collapsed")
+
+            # Show output (editable)
+            st.text_area(
+                "Result",
+                value=final_output,
+                height=min(300, len(output_lines) * 30 + 50),
+                label_visibility="collapsed"
+            )
+
+            # ✅ COPY BUTTON (native Streamlit)
+            st.markdown("#### 📋 Copy Attendance")
+            st.code(final_output, language="text")
